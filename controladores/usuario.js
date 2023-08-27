@@ -1,6 +1,7 @@
 const Usuario = require('../modelos/Usuario');
 const bcrypt = require('bcryptjs');
 const {jwtgenerador} = require('../helpers/JWT');
+const session = require('express-session')
 
 
 const listarUsarios = async(req, res) => {
@@ -55,7 +56,15 @@ const login = async(req, res) => {
 
         //Generar el token
         const token = jwtgenerador(usuarioEncontrado);
-        console.log(usuarioEncontrado);
+        /* console.log(usuarioEncontrado); */
+
+        const usuarioSession = {
+            correo: usuarioEncontrado.correo,
+            rol: usuarioEncontrado.rol,
+            _id: usuarioEncontrado._id
+        }
+
+        session.usuario = usuarioSession;
 
         return res.status(200).send({
             msg:"Logueo Existos!",
@@ -102,7 +111,7 @@ const register = async(req, res) => {
 
         nuevoUsuario = await nuevoUsuario.save();
 
-        return res.status(200).send({
+        return res.status(201).send({
             msg:"Registro Existos!",
             usuario:{
                 nombre: nuevoUsuario.nombreUsuario,

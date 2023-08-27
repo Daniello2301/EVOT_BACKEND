@@ -1,4 +1,3 @@
-const mongoose = require('mongoose')
 const Graduado = require('../modelos/Graduado');
 
 const getGraduados = async(req, res) => {
