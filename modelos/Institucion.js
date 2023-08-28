@@ -32,6 +32,10 @@ const InstitucionSchema = Schema({
         type:Schema.Types.ObjectId,
         ref:'Usuario',
         require:true
+    },
+    estado:{
+        type : Boolean ,
+        default  : true
     }
 },{
     timestamps: false,

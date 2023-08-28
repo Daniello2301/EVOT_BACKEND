@@ -18,6 +18,10 @@ router.post('/auth/register', contrUsuario.register);
 // deshabilidar usario
 router.put('/deactivate/user/:id', contrUsuario.deshabilitarUsuario);
 
+
+// Activar Usuario
+router.put('/activate/user/:id', contrUsuario.activarUsuario);
+
 // Borrar gradudo
 /* router.delete('/delete/graduado/:id', controladorGraduados.deleteGraduado); */
 

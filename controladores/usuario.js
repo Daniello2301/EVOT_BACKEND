@@ -1,7 +1,8 @@
 const Usuario = require('../modelos/Usuario');
 const bcrypt = require('bcryptjs');
 const {jwtgenerador} = require('../helpers/JWT');
-const session = require('express-session')
+const session = require('express-session');
+const Institucion = require('../modelos/Institucion');
 
 
 const listarUsarios = async(req, res) => {
@@ -61,7 +62,8 @@ const login = async(req, res) => {
         const usuarioSession = {
             correo: usuarioEncontrado.correo,
             rol: usuarioEncontrado.rol,
-            _id: usuarioEncontrado._id
+            _id: usuarioEncontrado._id,
+            institucion: usuarioEncontrado.institucion
         }
 
         session.usuario = usuarioSession;
@@ -144,7 +146,7 @@ const deshabilitarUsuario = async(req, res) => {
         usuarioEncontrado = await usuarioEncontrado.save();
 
         return res.status(200).send({
-            msg:"Cambio Existos!",
+            msg:"Desactivacion Existos!",
             usuario:{
                 nombre: usuarioEncontrado.nombreUsuario,
                 correo:usuarioEncontrado.correo,
@@ -160,10 +162,42 @@ const deshabilitarUsuario = async(req, res) => {
     }
 
 }
-module.exports = {
+
+const activarUsuario = async(req, res) =>{
+    try {
+        
+        // Buscamos por id el usuario
+        let usuarioEncontrado = await Usuario.findById({ _id: req.params.id })
+        if(!usuarioEncontrado){
+            return res.status(401).json({msg: 'El usuario no se encontro'});
+        }
+
+        // Cambiamos el estado
+        usuarioEncontrado.activo = true;
+
+        usuarioEncontrado = await usuarioEncontrado.save();
+
+        return res.status(200).send({
+            msg:"Activacion Existos!",
+            usuario:{
+                nombre: usuarioEncontrado.nombreUsuario,
+                correo:usuarioEncontrado.correo,
+                rol: usuarioEncontrado.rol,
+                activo: usuarioEncontrado.activo
+            }
+        });
+
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({msg:"Error interno del servidor", error: error})
+    }
+}
+module.exports = { 
     listarUsarios,
     listPorId,
     login,
     register,
-    deshabilitarUsuario
+    deshabilitarUsuario,
+    activarUsuario
 }

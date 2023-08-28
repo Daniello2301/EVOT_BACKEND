@@ -7,6 +7,8 @@ const router = Router();
 router.get('/graduados', controladorGraduados.getGraduados);
 router.get('/graduado/:id', controladorGraduados.getById);
 
+router.get('/graduados/institution', controladorGraduados.graduadosPorIddeInstitucion);
+
 
 // crear graduado
 router.post('/create/graduado', controladorGraduados.createGraduado);

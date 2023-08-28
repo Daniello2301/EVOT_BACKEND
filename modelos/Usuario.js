@@ -21,12 +21,16 @@ const UsuarioSchema = Schema({
         require: true,
         enum: ['INSTITUCION', 'ADMIN']
     },
+    institucion:{
+        type : Schema.Types.ObjectId ,
+        ref:'Institucion'
+    },
     activo:{
         type:Boolean,
         require: true,
         default: true
     }
-
+    
     
 },{    
     timestamp: true,
