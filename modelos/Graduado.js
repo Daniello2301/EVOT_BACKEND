@@ -14,11 +14,6 @@ const GraduadoSchema = Schema({
         type: Date,
         require: true
     },
-    institucion:{
-        type: Schema.Types.ObjectId,
-        ref:'Institucion',
-        require: true
-    },
     estado:{
         type : Boolean ,
         default: true

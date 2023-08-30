@@ -1,5 +1,6 @@
 const Graduado = require('../modelos/Graduado');
 const session = require('express-session');
+const InstuGraduados = require('../modelos/Institucion_Graduado');
 
 const getGraduados = async (req, res) => {
     try {
@@ -27,29 +28,32 @@ const graduadosPorIddeInstitucion = async (req, res) => {
 
         if (!usuarioSession) return res.status(500).send({ msg: "Login necesario" });
 
-        const graduados = await Graduado.aggregate([
+        const graduados = await InstuGraduados.aggregate([
             {
                 $lookup: {
-                    from: 'institucions',
-                    localField: 'institucion',
+                    from: 'graduados',
+                    localField: 'idGraduado',
                     foreignField: '_id',
-                    as: 'institucion'
+                    as: 'graduado'
+                },
+                $lookup:{
+                    from:'institucions',
+                    localField: 'idInstitucion',
+                    
                 }
             },
             {
                 $match: {
-                    'institucion._id': usuarioSession.institucion
+                    'idInstitucion': usuarioSession.institucion
                 }
             },
             {
                 $project: {
-                    estado: 1,
-                    cedula: 1,
-                    nombreCompleto: 1,
-                    fechaNacimiento: 1,
-                    institucion: {
-                        nombreInstitucion: 1,
-                        codigoInstiticion: 1,
+                    idInstitucion: 1,
+                    graduado: {
+                        cedula: 1,
+                        nombreCompleto: 1,
+                        fechaNacimiento: 1,
                     }
                 }
             }
@@ -95,8 +99,27 @@ const createGraduado = async (req, res) => {
         if (!usuarioSession) return res.status(500).send({ msg: "Login necesario" });
 
         const graduadoExistente = await Graduado.findOne({ cedula: data.cedula });
+        console.log(graduadoExistente);
+
+        let instuGraduado = new InstuGraduados();
+
         if (graduadoExistente) {
-            return res.status(400).json({ msg: "El graduado ya existe" });
+            const existeRealacion = await InstuGraduados.exists({
+                idInstitucion: usuarioSession.institucion,
+                idGraduado: graduadoExistente._id,
+            })
+
+            console.log(existeRealacion);
+            if(existeRealacion) {
+                return res.status(200).json({ msg: "El estudiante ya existe", estudiante: graduadoExistente });
+            }
+
+            instuGraduado.idInstitucion = usuarioSession.institucion;
+            instuGraduado.idGraduado = graduadoExistente._id;
+    
+            await instuGraduado.save();
+    
+            return res.status(200).json({ msg: "El estudiante ya existe en la base de datos, se creó la relacion con la insticion", estudiante: graduadoExistente });
         }
 
         let nuevoGraduado = new Graduado();
@@ -104,12 +127,14 @@ const createGraduado = async (req, res) => {
         nuevoGraduado.cedula = data.cedula;
         nuevoGraduado.nombreCompleto = data.nombreCompleto;
         nuevoGraduado.fechaNacimiento = data.fechaNacimiento || "0000-00-00T00:00:00.000Z";
-        nuevoGraduado.institucion = usuarioSession.institucion;
-
 
         nuevoGraduado = await nuevoGraduado.save();
 
-        return res.status(200).json({ msg: "El graduado se guardo correctamtene", graduado: nuevoGraduado });
+        instuGraduado.idInstitucion = usuarioSession.institucion;
+        instuGraduado.idGraduado = nuevoGraduado._id;
+        await instuGraduado.save();
+
+        return res.status(200).json({ msg: "El estudiante se guardo correctamtene", graduado: nuevoGraduado });
 
     } catch (error) {
         console.log(error);

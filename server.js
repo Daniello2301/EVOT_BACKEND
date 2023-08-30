@@ -35,13 +35,15 @@ app.get('/', (req, res) => {
 
 // importamos las rutas
 const graduado = require('./rutas/graduados');
-const usuario = require('./rutas/usuario')
-const institucion = require('./rutas/institucion')
+const usuario = require('./rutas/usuario');
+const institucion = require('./rutas/institucion');
+const diploma = require('./rutas/diploma');
 
 // asiganammos a las rutas
 app.use('/api', graduado);
 app.use('/api', usuario);
 app.use('/api', institucion);
+app.use('/api', diploma);
 
 // levantamos la aplicación por el puerto definido
 app.listen(PORT, () => {
