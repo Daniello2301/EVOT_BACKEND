@@ -1,79 +1,103 @@
-const app = require('../server'); // Import your Express app
-const expect = require('chai').expect;
+const { app, server } = require('../server');
 const request = require('supertest');
-const mongoose = require('mongoose'); // Import mongoose if you're using it for your database
+const Usuario = require('../modelos/Usuario');
+const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
+
+
+const api = request(app);
+
+const usuarios = [
+    {
+        nombreUsuario: "Esperanza Perdido",
+        correo: "Esperanza@mintic.edu.co",
+        contraseña: "123456",
+        rol: "INSTITUCION"
+    },
+    {
+        nombreUsuario: "Salazar Y Herrera",
+        correo: "IUSH@mintic.edu.co",
+        contraseña: "123456",
+        rol: "INSTITUCION"
+    }
+]
 
 describe('Authentication API Tests', () => {
-    before((done) => {
-        // Connect to a test database
-        const uri = process.env.MONGO_URI;
-        mongoose.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        })
-        .then(() => done())
-        .catch((err) => done(err));
-    });
+    beforeAll(async () => {
+        await Usuario.deleteMany({ correo: "normal@mintic.edu.co" });
 
-    after((done) => {
-        // Disconnect and close the database connection after tests
-        mongoose.disconnect()
-            .then(() => done())
-            .catch((err) => done(err));
-    });
+         /* let usu1 = new Usuario(usuarios[0]);
+        const salt = bcrypt.genSaltSync(10);
+        const contraseñaEncriptada = bcrypt.hashSync(usu1.contraseña, salt);
+        usu1.contraseña = contraseñaEncriptada;
+        await usu1.save();
 
-    it('should register a new user', (done) => {
+        let usu2 = new Usuario(usuarios[1]);
+        const contraseñaEncriptada2 = bcrypt.hashSync(usu2.contraseña, salt);
+        usu2.contraseña = contraseñaEncriptada2;
+         await usu2.save(); */
+    })
+
+    afterAll(() => {
+        mongoose.connection.close();
+        server.close();
+    })
+
+    test('Listar usuarios', async () => {
+        const res = await api.get('/api/users');
+        expect(res.body).toHaveLength(2);
+    })
+
+
+    test('should register a new user', async () => {
         const newUser = {
-            nombreUsuario:"NORMAL SUPERIOR",
-            correo:"normal@mintic.edu.co",
-            contraseña:"123456",
-            rol:"INSTITUCION"
+            nombreUsuario: "NORMAL SUPERIOR",
+            correo: "normal@mintic.edu.co",
+            contraseña: "123456",
+            rol: "INSTITUCION"
         };
 
-        request(app)
+        const response = await request(app)
             .post('/api/auth/register')
             .send(newUser)
             .expect(201)
-            .end(async (err, res) => {
-                if (err) return done(err);
-                await expect(res.body).to.have.property('usuario');
-                await expect(res.body.usuario.correo).to.equal(newUser.correo);
-                done();
-            });
+
+        expect(response.body.usuario.nombreUsuario).toEqual(newUser.nombreUsuario);
+        expect(response.body.msg).toEqual(expect.stringMatching("Registro Existos!"));
     });
 
-    it('should log in an existing user', (done) => {
+    test('should log in an existing user', async () => {
         const userCredentials = {
-            correo: 'ieprav@ieprav.edu.co',
+            correo: 'IUSH@mintic.edu.co',
             contraseña: '123456',
         };
 
-        request(app)
+        const response = await api
             .post('/api/auth')
             .send(userCredentials)
             .expect(200)
-            .end(async(err, res) => {
-                if (err) return done(err);
-                await expect(res.body).to.have.property('usuario');
-                done();
-            });
+
+        expect(response.body.msg).toEqual(expect.stringMatching("Logueo Existos!"));
     });
 
-    it("should warning message if your state is false", (done) => {
+    test("Muestra mensaje de credenciales incorrectas", async () => {
         const userCredentials = {
-            correo: 'pio_XII@mintic.edu.co',
-            contraseña: '123456',
+            correo: 'IUSH@mintic.edu.co',
+            contraseña: 'IUSH123456',
         };
 
-        request(app)
+        const res = await api
             .post('/api/auth')
             .send(userCredentials)
-            .expect(401)
-            .end(async(err, res) => {
-                if (err) return done(err);
-                await expect(res.body).to.have.property('msg');
-                await expect(res.body.msg).to.equal('Verifica tu licencia');
-                done();
-            });
+            .expect(401);
+        expect(res.body.msg).toEqual(expect.stringMatching("Correo o Contraseña incorrecta"))
+    })
+
+    test("Desactivar usuario", async() =>{
+        const id = "64f77a5eabaae67a8534ccc8"
+        const res = await api
+            .put(`/api/deactivate/user/64f77a5eabaae67a8534ccc8`)
+            .expect(200)
+            expect(res.body.msg).toEqual(expect.stringMatching("Desactivacion Existos!"))
     })
 });

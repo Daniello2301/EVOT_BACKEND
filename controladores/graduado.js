@@ -1,13 +1,13 @@
 const Graduado = require('../modelos/Graduado');
 const session = require('express-session');
 const InstuGraduados = require('../modelos/Institucion_Graduado');
+const { validationResult } = require('express-validator');
 
+const myValidationResult = validationResult.withDefaults({
+    formatter: error => error.msg,
+});
 const getGraduados = async (req, res) => {
     try {
-
-        const usuarioSession = session.usuario
-        console.log(usuarioSession);
-
         const graduados = await Graduado.find();
         if (graduados.length > 0) {
             res.status(200).json(graduados);
@@ -16,7 +16,7 @@ const getGraduados = async (req, res) => {
         }
 
     } catch (error) {
-        res.statu(500).send(error);
+        res.status(500).send(error);
     }
 }
 
@@ -24,7 +24,6 @@ const graduadosPorIddeInstitucion = async (req, res) => {
     try {
 
         const usuarioSession = session.usuario
-        console.log(usuarioSession?.institucion);
 
         if (!usuarioSession) return res.status(500).send({ msg: "Login necesario" });
 
@@ -36,11 +35,6 @@ const graduadosPorIddeInstitucion = async (req, res) => {
                     foreignField: '_id',
                     as: 'graduado'
                 },
-                $lookup:{
-                    from:'institucions',
-                    localField: 'idInstitucion',
-                    
-                }
             },
             {
                 $match: {
@@ -48,8 +42,11 @@ const graduadosPorIddeInstitucion = async (req, res) => {
                 }
             },
             {
+                $unwind: '$graduado'
+            },
+            {
                 $project: {
-                    idInstitucion: 1,
+                    _id: 0,
                     graduado: {
                         cedula: 1,
                         nombreCompleto: 1,
@@ -91,15 +88,21 @@ const getById = async (req, res) => {
 
 const createGraduado = async (req, res) => {
     try {
-        const usuarioSession = session.usuario
-        console.log(usuarioSession);
+        
+        const errorsValidation = myValidationResult(req);
+        if (!errorsValidation.isEmpty()) {
+            let errors = errorsValidation.array()
+            return res.status(500).json({
+                errors
+            });
+        }
 
+        const usuarioSession = session.usuario
         const { ...data } = req.body;
 
         if (!usuarioSession) return res.status(500).send({ msg: "Login necesario" });
 
         const graduadoExistente = await Graduado.findOne({ cedula: data.cedula });
-        console.log(graduadoExistente);
 
         let instuGraduado = new InstuGraduados();
 
@@ -109,16 +112,15 @@ const createGraduado = async (req, res) => {
                 idGraduado: graduadoExistente._id,
             })
 
-            console.log(existeRealacion);
-            if(existeRealacion) {
+            if (existeRealacion) {
                 return res.status(200).json({ msg: "El estudiante ya existe", estudiante: graduadoExistente });
             }
 
-            instuGraduado.idInstitucion = usuarioSession.institucion;
+            instuGraduado.idInstitucion = usuarioSession.institucion ?? req.body.institucion;
             instuGraduado.idGraduado = graduadoExistente._id;
-    
+
             await instuGraduado.save();
-    
+
             return res.status(200).json({ msg: "El estudiante ya existe en la base de datos, se creó la relacion con la insticion", estudiante: graduadoExistente });
         }
 
@@ -130,7 +132,7 @@ const createGraduado = async (req, res) => {
 
         nuevoGraduado = await nuevoGraduado.save();
 
-        instuGraduado.idInstitucion = usuarioSession.institucion;
+        instuGraduado.idInstitucion = usuarioSession.institucion ?? req.body.institucion;
         instuGraduado.idGraduado = nuevoGraduado._id;
         await instuGraduado.save();
 
@@ -159,11 +161,6 @@ const updateGraduado = async (req, res) => {
             return res.status(400).json({ msg: "El graduado ya existe" });
         }
 
-        /* if(cedula){
-            gradudoEncontrado.cedula = cedula;
-        }else{
-            gradudoEncontrado.cedula = gradudoEncontrado.cedula;            
-        } */
         gradudoEncontrado.cedula = cedula ? cedula : gradudoEncontrado.cedula;
         gradudoEncontrado.nombreCompleto = nombreCompleto ? nombreCompleto : gradudoEncontrado.nombreCompleto;
         gradudoEncontrado.fechaNacimiento = fechaNacimiento ? fechaNacimiento : gradudoEncontrado.fechaNacimiento;

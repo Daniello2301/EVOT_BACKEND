@@ -46,9 +46,9 @@ app.use('/api', institucion);
 app.use('/api', diploma);
 
 // levantamos la aplicación por el puerto definido
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`);
 });
 
 
-module.exports = app;
+module.exports = { app, server };

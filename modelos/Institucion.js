@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 const InstitucionSchema = Schema({
-    codigoInstiticion:{
+    codigoInstitucion:{
         type: Number,
         require: true,
         unique: true

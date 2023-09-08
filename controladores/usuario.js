@@ -3,7 +3,11 @@ const bcrypt = require('bcryptjs');
 const {jwtgenerador} = require('../helpers/JWT');
 const session = require('express-session');
 const Institucion = require('../modelos/Institucion');
+const { validationResult } =require('express-validator')
 
+const myValidationResult = validationResult.withDefaults({
+    formatter: error => error.msg,
+});
 
 const listarUsarios = async(req, res) => {
     try {
@@ -37,6 +41,13 @@ const listPorId = async(req, res) => {
 const login = async(req, res) => {
     try {
         
+        const errorsValidation = myValidationResult(req);
+        if (!errorsValidation.isEmpty()) {
+            let errors = errorsValidation.array()
+            return res.status(500).json({
+                errors
+            });
+        }
 
         // Validamos que el correo exista
         const usuarioEncontrado = await Usuario.findOne({ correo: req.body.correo});
@@ -87,6 +98,14 @@ const login = async(req, res) => {
 const register = async(req, res) => {
     try {
         
+        const errorsValidation = myValidationResult(req);
+        if (!errorsValidation.isEmpty()) {
+            let errors = errorsValidation.array()
+            return res.status(500).json({
+                errors
+            });
+        }
+
         // Que no exista el nombre
         const nombreEncontrado = await Usuario.findOne({ nombreUsuario: req.body.nombreUsuario});
         if(nombreEncontrado){
@@ -116,7 +135,7 @@ const register = async(req, res) => {
         return res.status(201).send({
             msg:"Registro Existos!",
             usuario:{
-                nombre: nuevoUsuario.nombreUsuario,
+                nombreUsuario: nuevoUsuario.nombreUsuario,
                 correo:nuevoUsuario.correo,
                 rol: nuevoUsuario.rol,
                 activo: nuevoUsuario.activo

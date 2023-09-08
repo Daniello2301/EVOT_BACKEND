@@ -1,46 +1,13 @@
 const Institucion = require('../modelos/Institucion')
 const Usuario = require('../modelos/Usuario')
 const session = require('express-session')
+const { validationResult } = require('express-validator');
 
+const myValidationResult = validationResult.withDefaults({
+    formatter: error => error.msg,
+});
 const getAll = async (req, res) => {
     try {
-
-        const usuarioSession = session.usuario
-        console.log(usuarioSession);
-        /*  const instituciones = await Institucion.aggregate([
-            {
-                $lookup: {
-                    from: 'usuarios', // Name of the Usuario collection
-                    localField: 'usuario',
-                    foreignField: '_id',
-                    as: 'usuarioInfo'
-                }
-            },
-            {
-                $match: {
-                    'usuarioInfo.activo': true
-                }
-            },
-            {
-                $project: {
-                    codigoInstiticion: 1,
-                    nombreInstitucion: 1,
-                    ciudad: 1,
-                    departamento: 1,
-                    resolucion: 1,
-                    fechaResolucion: 1,
-                    estado: 1,
-                    usuarioInfo: {
-                        nombreUsuario: 1,
-                        correo: 1,
-                        rol: 1,
-                        activo: 1
-                        // Include other user attributes you want
-                    }
-                }
-            }
-
-        ]); */
         const instituciones = await Institucion.find().populate({
             path: 'usuario',
             select: "nombreUsuario correo activo",
@@ -48,7 +15,7 @@ const getAll = async (req, res) => {
 
         if (instituciones.length <= 0) return res.status(404).send({ msg: "Informacion no encontrada" });
 
-        return res.status(201).send(instituciones);
+        return res.status(200).send(instituciones);
 
     } catch (error) {
         console.log(error);
@@ -72,12 +39,10 @@ const getById = async (req, res) => {
 };
 const getWithActveUser = async(req, res) =>{
     try {
-        const usuarioSession = session.usuario
-        console.log(usuarioSession);
         const institucionesActivas = await Institucion.aggregate([
             {
                 $lookup: {
-                    from: 'usuarios', // Name of the Usuario collection
+                    from: 'usuarios', 
                     localField: 'usuario',
                     foreignField: '_id',
                     as: 'usuario'
@@ -121,26 +86,32 @@ const getWithActveUser = async(req, res) =>{
 const crear = async (req, res) => {
     try {
 
+        const errorsValidation = myValidationResult(req);
+        if (!errorsValidation.isEmpty()) {
+            let errors = errorsValidation.array()
+            return res.status(500).json({
+                errors
+            });
+        }
         const usuarioSession = session.usuario
-        console.log(usuarioSession);
 
-        const institcionExistente = await Institucion.findOne({ codigoInstiticion: req.body.codigoInstiticion });
+        const institcionExistente = await Institucion.findOne({ codigoInstitucion: req.body.codigoInstitucion });
         if (institcionExistente) return res.status(409).send({ msg: "La institucion ya existe" });
 
-        if (!usuarioSession) return res.status(500).send({ msg: "Login necesario" });
+        if (!usuarioSession) return res.status(400).send({ msg: "Login necesario" });
 
         let usuarioRegistrado = await Usuario.findById({_id: usuarioSession._id});
         if (!usuarioRegistrado) return res.status(500).send({ msg: "Login necesario" });
 
         let newInstitucion = new Institucion();
 
-        newInstitucion.codigoInstiticion = req.body.codigoInstiticion
+        newInstitucion.codigoInstitucion = req.body.codigoInstitucion
         newInstitucion.nombreInstitucion = req.body.nombreInstitucion
         newInstitucion.ciudad = req.body.ciudad
         newInstitucion.departamento = req.body.departamento
         newInstitucion.resolucion = req.body.resolucion
         newInstitucion.fechaResolucion = req.body.fechaResolucion
-        newInstitucion.usuario = usuarioSession?._id
+        newInstitucion.usuario = usuarioSession?._id ?? req.body.usuario
 
         newInstitucion = await newInstitucion.save();
 
@@ -149,8 +120,6 @@ const crear = async (req, res) => {
         if(!session.usuario?.institucion){
             session.usuario.institucion = newInstitucion._id;
         }
-
-        console.log(session.usuario);
 
         return res.status(201).send(newInstitucion);
 
@@ -163,7 +132,6 @@ const actualizar = async (req, res) => {
     try {
 
         const usuarioSession = session.usuario
-        console.log(usuarioSession);
 
         const { id } = req.params;
 
@@ -223,8 +191,6 @@ const activar = async (req, res) => {
         institucionEncontrada.estado = true;
 
         institucionEncontrada = await institucionEncontrada.save();
-
-        console.log(institucionEncontrada);
 
         return res.status(201).send(institucionEncontrada);
 

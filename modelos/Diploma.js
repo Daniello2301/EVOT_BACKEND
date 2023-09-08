@@ -1,7 +1,7 @@
 const {Schema, model} = require('mongoose');
 
 const DiplomaSchema = Schema({
-    codigoDiloma:{
+    codigoDiploma:{
         type: String,
         require: true,
         unique:true
