@@ -62,6 +62,7 @@ const getWithActveUser = async(req, res) =>{
                     departamento: 1,
                     resolucion: 1,
                     fechaResolucion: 1,
+                    logo: 1,
                     usuario: {
                         nombreUsuario: 1,
                         correo: 1,
