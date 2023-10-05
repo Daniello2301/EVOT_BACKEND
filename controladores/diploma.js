@@ -87,11 +87,11 @@ const listarPorGraduado = async (req, res) => {
             });
         }
 
-        const usuarioSession = session.usuario;
+        /* const usuarioSession = session.usuario */;
 
         const { cedula } = req.body;
 
-        if (!usuarioSession) return res.status(400).send({ msg: "Login necesario" });
+        /* if (!usuarioSession) return res.status(400).send({ msg: "Login necesario" }); */
 
         const diplomasEncontrado = await Diploma.aggregate([
             {
