@@ -23,6 +23,7 @@ app.use(session({
 app.use(cors());
 app.use(express.json());
 app.use(methodoverride());
+app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
 // definimos puertos

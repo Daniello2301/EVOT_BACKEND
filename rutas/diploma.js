@@ -20,11 +20,7 @@ diplomaControlador.listarPorId);
 
 
 // Buscar por cedula de graduado
-route.get('/diplomas/by/graduate',
-[
-    check('cedula', 'La cedula es requerida').not().isEmpty(),
-    check('cedula', 'Debe ser un numero').isNumeric()
-],
+route.get('/diplomas/by/graduate/:cedula',
 diplomaControlador.listarPorGraduado);
 
 

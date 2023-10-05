@@ -67,7 +67,7 @@ const listarPorInstitucion = async (req, res) => {
 
         if (!diplomasEncontrado) return res.status(404).send({ msg: "La institucion actual no tiene diplomas registrados" });
 
-        return res.status(201).send(diplomasEncontrado);
+        return res.status(200).send(diplomasEncontrado);
 
     } catch (error) {
         console.log(error);
@@ -76,22 +76,13 @@ const listarPorInstitucion = async (req, res) => {
 };
 const listarPorGraduado = async (req, res) => {
     try {
-
-        const errorsValidation = myValidationResult(req);
-
-        if (!errorsValidation.isEmpty()) {
-            let errors = errorsValidation.array()
-            console.log(errors)
-            return res.status(500).json({
-                errors
-            });
-        }
-
-        /* const usuarioSession = session.usuario */;
-
-        const { cedula } = req.body;
+        const {cedula}  = req.params;
 
         /* if (!usuarioSession) return res.status(400).send({ msg: "Login necesario" }); */
+
+        const graduadoEncontrado = await Graduado.findOne({ cedula: cedula});
+        if(!graduadoEncontrado)  return res.status(400).send({ msg: "Graduado no encontrado" });
+
 
         const diplomasEncontrado = await Diploma.aggregate([
             {
@@ -112,7 +103,7 @@ const listarPorGraduado = async (req, res) => {
             },
             {
                 $match: {
-                    'graduado.cedula': cedula
+                    'graduado.cedula': parseInt(graduadoEncontrado.cedula)
                 }
             },
             {
@@ -146,9 +137,10 @@ const listarPorGraduado = async (req, res) => {
                 }
             }
         ]);
-        if (!diplomasEncontrado) return res.status(404).send({ msg: "La institucion actual no tiene diplomas registrados" });
+        console.log(diplomasEncontrado); 
+        if (diplomasEncontrado.length <= 0) return res.status(404).send({ msg: "Diplomas no encontradoss" });
 
-        return res.status(201).send(diplomasEncontrado);
+        return res.status(200).send(diplomasEncontrado);
 
     } catch (error) {
         console.log(error);
