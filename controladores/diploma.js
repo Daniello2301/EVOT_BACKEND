@@ -170,10 +170,10 @@ const crear = async (req, res) => {
             return res.status(400).send({ msg: "El diploma ya existe" });
         }
         const graduado = await Graduado.findOne({
-            cedula: req.body.graduado
+            cedula: req.body.cedula
         });
-        console.log("Usuario: ", graduado._id);
-        if (!graduado) return res.statu(404).send({ msg: "El graduado no existe, por favor registralo" });
+        console.log("Usuario: ", graduado?._id);
+        if (!graduado) return res.status(404).send({ msg: "El graduado no existe, por favor registralo" });
 
 
         nuevoDiploma.codigoDiploma = req.body.codigoDiploma;
@@ -188,7 +188,7 @@ const crear = async (req, res) => {
 
         nuevoDiploma = await nuevoDiploma.save();
 
-        return res.status(201).send(nuevoDiploma);
+        return res.status(201).send({msg:"Diploma creado correctamente", diploma: nuevoDiploma});
 
     } catch (error) {
         console.log(error);
