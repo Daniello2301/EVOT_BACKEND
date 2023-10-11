@@ -179,7 +179,7 @@ const crear = async (req, res) => {
         nuevoDiploma.codigoDiploma = req.body.codigoDiploma;
         nuevoDiploma.nombrePrograma = req.body.nombrePrograma;
         nuevoDiploma.nivelPrograma = req.body.nivelPrograma;
-        nuevoDiploma.registroProgramas = req.body.registroPrograma;
+        nuevoDiploma.registroPrograma = req.body.registroPrograma;
         nuevoDiploma.libro = req.body.libro;
         nuevoDiploma.fechaGrados = req.body.fechaGrados;
         nuevoDiploma.estado = true || req.body.estado
@@ -220,7 +220,7 @@ const actualizar = async (req, res) => {
         diplomaEncontrado.codigoDiploma = codigoDiploma ?? diplomaEncontrado.codigoDiploma;
         diplomaEncontrado.nombrePrograma = data.nombrePrograma ?? diplomaEncontrado.nombrePrograma;
         diplomaEncontrado.nivelPrograma = data.nivelPrograma ?? diplomaEncontrado.nivelPrograma;
-        diplomaEncontrado.registroProgramas = data.registroPrograma ?? diplomaEncontrado.registroProgramas;
+        diplomaEncontrado.registroPrograma = data.registroPrograma ?? diplomaEncontrado.registroPrograma;
         diplomaEncontrado.libro = data.libro ?? diplomaEncontrado.libro;
         diplomaEncontrado.fechaGrados = data.fechaGrados ?? diplomaEncontrado.fechaGrados;
         diplomaEncontrado.estado = data.estado ?? diplomaEncontrado.estado;
