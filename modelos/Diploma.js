@@ -1,50 +1,61 @@
 const {Schema, model} = require('mongoose');
 
+// Define the schema for a Diploma
 const DiplomaSchema = Schema({
-    codigoDiploma:{
+    // The unique code for the diploma
+    codigoDiploma: {
         type: String,
-        require: true,
-        unique:true
+        required: true,
+        unique: true
     },
-    nombrePrograma:{
-        type :String ,
-        require: true
-    },
-    nivelPrograma:{
-        type : String,
-        require:true
-    },
-    registroPrograma:{
+    // The name of the program
+    nombrePrograma: {
         type: String,
-        require:true
+        required: true
     },
-    libro:{
-        type:String,
-        require: true
+    // The level of the program (e.g., Bachelor's, Master's)
+    nivelPrograma: {
+        type: String,
+        required: true
     },
-    fechaGrados:{
+    // The registration number of the program
+    registroPrograma: {
+        type: String,
+        required: true
+    },
+    // The book number where the diploma is recorded
+    libro: {
+        type: String,
+        required: true
+    },
+    // The date of graduation
+    fechaGrados: {
         type: Date,
-        require: true
+        required: true
     },
-    graduado:{
-        type:Schema.Types.ObjectId,
+    // Reference to the graduated person
+    graduado: {
+        type: Schema.Types.ObjectId,
         ref: 'Graduado',
-        require:true
+        required: true
     },
-    institucion:{
-        type:Schema.Types.ObjectId,
-        ref:'Institucion',
-        require:true
+    // Reference to the institution
+    institucion: {
+        type: Schema.Types.ObjectId,
+        ref: 'Institucion',
+        required: true
     },
-    estado:{
+    // The status of the diploma (true means active)
+    estado: {
         type: Boolean,
-        default:true
+        default: true
     }
-},{
-    timestamp: true,
+}, {
+    // Automatically add createdAt and updatedAt fields
+    timestamps: true,
+    // Do not include the version key (__v) in documents
     versionKey: false
 });
 
-
+// Export the model based on the schema
 module.exports = model('Diploma', DiplomaSchema);
-

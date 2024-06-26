@@ -1,20 +1,25 @@
 const { Schema, model } = require('mongoose');
 
+// Define the schema for the relationship between Institution and Graduate
 const InstiGraduadoSchema = Schema({
-    idInstitucion:{
+    // Reference to the Institution
+    idInstitucion: {
         type: Schema.Types.ObjectId,
-        ref:'Institucion',
-        require: true
+        ref: 'Institucion',
+        required: true
     },
-    idGraduado:{
+    // Reference to the Graduate
+    idGraduado: {
         type: Schema.Types.ObjectId,
-        ref:'Graduado',
-        require: true
+        ref: 'Graduado',
+        required: true
     }
-},
-{
-    timestamp: true,
+}, {
+    // Automatically add createdAt and updatedAt fields
+    timestamps: true,
+    // Do not include the version key (__v) in documents
     versionKey: false
 });
 
-module.exports= model('InstuGraduados', InstiGraduadoSchema);
+// Export the model based on the schema
+module.exports = model('InstiGraduado', InstiGraduadoSchema);

@@ -1,40 +1,47 @@
 const { Schema, model } = require('mongoose');
 
+// Define the schema for a User
 const UsuarioSchema = Schema({
-    
-    nombreUsuario:{
+    // The unique username
+    nombreUsuario: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
-    correo:{
+    // The unique email of the user
+    correo: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
-    contraseña:{
+    // The password of the user
+    contraseña: {
         type: String,
-        require: true
+        required: true
     },
-    rol:{
-        type:String,
-        require: true,
+    // The role of the user, must be either 'INSTITUCION' or 'ADMIN'
+    rol: {
+        type: String,
+        required: true,
         enum: ['INSTITUCION', 'ADMIN']
     },
-    institucion:{
-        type : Schema.Types.ObjectId ,
-        ref:'Institucion'
+    // Reference to the associated institution, if any
+    institucion: {
+        type: Schema.Types.ObjectId,
+        ref: 'Institucion'
     },
-    activo:{
-        type:Boolean,
-        require: true,
+    // The active status of the user (true means active)
+    activo: {
+        type: Boolean,
+        required: true,
         default: true
     }
-    
-    
-},{    
-    timestamp: true,
+}, {
+    // Automatically add createdAt and updatedAt fields
+    timestamps: true,
+    // Do not include the version key (__v) in documents
     versionKey: false
 });
 
+// Export the model based on the schema
 module.exports = model('Usuario', UsuarioSchema);

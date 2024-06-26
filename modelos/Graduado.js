@@ -1,26 +1,34 @@
 const { Schema, model } = require('mongoose');
 
+// Define the schema for a Graduado (Graduate)
 const GraduadoSchema = Schema({
-    cedula:{
+    // The unique ID number (cedula) of the graduate
+    cedula: {
         type: Number,
-        require: true,
+        required: true,
         unique: true
     },
-    nombreCompleto:{
+    // The full name of the graduate
+    nombreCompleto: {
         type: String,
-        require: true
+        required: true
     },
-    fechaNacimiento:{
+    // The date of birth of the graduate
+    fechaNacimiento: {
         type: Date,
-        require: true
+        required: true
     },
-    estado:{
-        type : Boolean ,
+    // The status of the graduate (true means active)
+    estado: {
+        type: Boolean,
         default: true
     }
-},{    
-    timestamp: true,
+}, {
+    // Automatically add createdAt and updatedAt fields
+    timestamps: true,
+    // Do not include the version key (__v) in documents
     versionKey: false
 });
 
+// Export the model based on the schema
 module.exports = model('Graduado', GraduadoSchema);
