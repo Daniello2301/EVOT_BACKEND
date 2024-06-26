@@ -1,5 +1,5 @@
-const JWT = require('jsonwebtoken');
-const dotenv = require('dotenv').config();
+const JWT = require("jsonwebtoken");
+const dotenv = require("dotenv").config();
 
 /**
  * Generates a JWT token and a refresh token for the given user.
@@ -12,25 +12,51 @@ const dotenv = require('dotenv').config();
  * @returns {Object} An object containing the JWT token and the refresh token.
  */
 const jwtgenerador = (usuario) => {
-    // Define the payload with user details
-    const payload = {
-        _id: usuario._id,
-        nombreUsuario: usuario.nombreUsuario,
-        correo: usuario.correo,
-        rol: usuario.rol
-    };
+  // Define the payload with user details
+  const payload = {
+    _id: usuario._id,
+    nombreUsuario: usuario.nombreUsuario,
+    correo: usuario.correo,
+    rol: usuario.rol,
+  };
 
-    // Generate a JWT token that expires in 1 hour
-    const token = JWT.sign(payload, `${process.env.SECRET_KEY_JWT}`, { expiresIn: '1h' });
+  // Generate a JWT token that expires in 1 hour
+  const token = JWT.sign(payload, `${process.env.SECRET_KEY_JWT}`, {
+    expiresIn: "1h",
+  });
 
-    // Generate a refresh token that expires in 1 day
-    const refreshToken = JWT.sign(payload, `${process.env.SECRET_KEY_JWT}`, { expiresIn: '1d' });
+  // Generate a refresh token that expires in 1 day
+  const refreshToken = JWT.sign(payload, `${process.env.SECRET_KEY_JWT}`, {
+    expiresIn: "1d",
+  });
 
-    // Return both tokens
-    return {
-        token,
-        refreshToken
-    };
-}
+  // Return both tokens
+  return {
+    token,
+    refreshToken,
+  };
+};
 
-module.exports = { jwtgenerador };
+const refreshToken = (user) => {
+  const userLogged = user;
+
+  const decoded = JWT.verify(
+    userLogged.token?.refreshToken,
+    `${process.env.SECRET_KEY_JWT}`
+  );
+
+  const accesToken = JWT.sign(
+    {
+      _id: decoded._id,
+      nombreUsuario: decoded.nombreUsuario,
+      correo: decoded.correo,
+      rol: decoded.rol,
+    },
+    `${process.env.SECRET_KEY_JWT}`,
+    { expiresIn: "1h" }
+  );
+
+  return accesToken;
+};
+
+module.exports = { jwtgenerador, refreshToken };
