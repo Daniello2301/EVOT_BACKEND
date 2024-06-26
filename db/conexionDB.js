@@ -11,10 +11,7 @@ const conexion = async() => {
 
     console.log('conectando a mogodb...');
     try {        
-        await mongoose.connect(URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(URI);
         console.log('conectado correctamente a mongodb');
     } catch (error) {
         console.log(error);

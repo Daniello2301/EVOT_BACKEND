@@ -12,7 +12,7 @@ const jwtValidador = (req, res, next) => {
         next();
     } catch (error) {
         console.log(error)
-        return res.status(500).send({ msg: "Error interno del servidor" });
+        return res.status(500).send({ msg: "Error interno del servidor", error: error });
     }
 }
 
@@ -29,7 +29,7 @@ const isAdmin = (req, res, next) => {
         next();
     } catch (error) {
         console.log(error)
-        return res.status(500).send({ msg: "Error interno del servidor" });
+        return res.status(500).send({ msg: "Error interno del servidor", error: error });
     }
 }
 

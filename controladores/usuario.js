@@ -149,6 +149,56 @@ const register = async(req, res) => {
     }
 }
 
+const resetPassword = async(req, res) => {
+
+    try {
+        
+        // Validamos los inputs de entrada
+        const errorsValidation = myValidationResult(req);
+        if (!errorsValidation.isEmpty()) {
+            let errors = errorsValidation.array()
+            return res.status(500).json({
+                errors
+            });
+        }
+
+        // Search usr by session id
+        let usuarioEncontrado = await Usuario.findById({ _id: session.usuario._id});
+        console.log(usuarioEncontrado);
+        if(!usuarioEncontrado){
+            return res.status(401).json({msg: 'El usuario no se encontro'});
+        }
+
+        // Encriptamos la contraseña
+        const salt = bcrypt.genSaltSync(10);
+        const contraseñaEncriptada = bcrypt.hashSync(req.body.nuevaContraseña, salt);
+
+        // Validate old password
+        const contraseñaComparada = bcrypt.compareSync(req.body.viejaContraseña, usuarioEncontrado.contraseña);
+        if(!contraseñaComparada){
+            return res.status(401).json({msg: 'Contraseña incorrecta'});
+        }
+
+        // Update password
+        usuarioEncontrado.contraseña = contraseñaEncriptada;
+
+        usuarioEncontrado = await usuarioEncontrado.save();
+
+        return res.status(200).send({
+            msg:"Actualizacion Existos!",
+            usuario: {
+                nombre: usuarioEncontrado.nombreUsuario
+            }
+        
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({msg:"Error interno del servidor", error: error})
+    }
+
+}
+
 const deshabilitarUsuario = async(req, res) => {
 
     try {
@@ -218,5 +268,6 @@ module.exports = {
     login,
     register,
     deshabilitarUsuario,
-    activarUsuario
+    activarUsuario,
+    resetPassword
 }

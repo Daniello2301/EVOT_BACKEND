@@ -62,6 +62,13 @@ router.put('/activate/user/:id',
 ],
 contrUsuario.activarUsuario);
 
+/* Reset password */
+router.put('/auth/reset/password', 
+[
+    jwtValidador,
+],
+contrUsuario.resetPassword);
+
 // Borrar gradudo
 /* router.delete('/delete/graduado/:id', controladorGraduados.deleteGraduado); */
 
