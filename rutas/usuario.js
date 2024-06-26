@@ -52,7 +52,11 @@ router.put(
 );
 
 /* Reset password */
-router.put("/auth/reset/password", [jwtValidador], contrUsuario.resetPassword);
+router.put("/auth/reset/password", [
+  jwtValidador,
+  check("viejaContraseña", "La antigua contraseña es requerida").notEmpty(),
+  check("nuevaContraseña", "La nueva contraseña es requerida").notEmpty(),
+], contrUsuario.resetPassword);
 
 /* Refresh Token */
 router.post("/auth/refresh/token", [jwtValidador], contrUsuario.refreshUserToken);

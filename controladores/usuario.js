@@ -157,13 +157,14 @@ const register = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
+
     // Validamos los inputs de entrada
     const errorsValidation = myValidationResult(req);
     if (!errorsValidation.isEmpty()) {
-      let errors = errorsValidation.array();
-      return res.status(500).json({
-        errors,
-      });
+        let errors = errorsValidation.array();
+        return res.status(500).json({
+            errors,
+        });
     }
 
     // Search usr by session id
