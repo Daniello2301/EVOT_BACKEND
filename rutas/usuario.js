@@ -6,7 +6,7 @@ const { check } = require("express-validator");
 const router = Router();
 
 // listar todo y por Id
-router.get("/users", [jwtValidador, isAdmin], contrUsuario.listarUsarios);
+router.get("/users", [jwtValidador, isAdmin], contrUsuario.listarUsuarios);
 
 router.get("/user/:id", [jwtValidador], contrUsuario.listPorId);
 

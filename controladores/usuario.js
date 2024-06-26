@@ -9,14 +9,14 @@ const myValidationResult = validationResult.withDefaults({
     formatter: (error) => error.msg,
   });
   
-  /**
-   * Lists all users in the database.
-   *
-   * @param {Object} req - The request object.
-   * @param {Object} res - The response object.
-   * @returns {Object} The response object with a list of users or an error message.
-   */
-  const listarUsuarios = async (req, res) => {
+/**
+ * Lists all users in the database.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Object} The response object with a list of users or an error message.
+ */
+const listarUsuarios = async (req, res) => {
     try {
       // Fetch all users from the database
       const usuarios = await Usuario.find();
@@ -28,7 +28,7 @@ const myValidationResult = validationResult.withDefaults({
       // Send an error response if there is a server error
       return res.status(500).send({ msg: "Internal server error", error: error });
     }
-  };
+};
 
 /**
  * Fetches a user by ID from the database.
@@ -338,12 +338,12 @@ const activarUsuario = async (req, res) => {
     }
   };
 module.exports = {
-  listarUsarios,
-  listPorId,
-  login,
-  register,
-  deshabilitarUsuario,
-  activarUsuario,
-  resetPassword,
-  refreshUserToken,
+    listarUsuarios,
+    listPorId,
+    login,
+    register,
+    deshabilitarUsuario,
+    activarUsuario,
+    resetPassword,
+    refreshUserToken,
 };
