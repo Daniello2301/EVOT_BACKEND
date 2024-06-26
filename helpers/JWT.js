@@ -10,8 +10,12 @@ const jwtgenerador = (usuario) => {
     };
 
     const token = JWT.sign(payload, `${process.env.SECRET_KEY_JWT}`, { expiresIn: '1h'});
+    const refreshToken = JWT.sign(payload, `${process.env.SECRET_KEY_JWT}`, { expiresIn: '1d'});
 
-    return token;
+    return {
+        token,
+        refreshToken
+    };
 }
 
 module.exports = { jwtgenerador };
