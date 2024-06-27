@@ -16,7 +16,7 @@ instituController.getAll);
 
 // Listar lasntituciones que tiene el usuario activo
 route.get('/institutions/actives',
-instituController.getWithActveUser);
+instituController.getWithActiveUser);
 
 
 // listar una institucion por Id
