@@ -37,14 +37,27 @@ const jwtgenerador = (usuario) => {
   };
 };
 
+
+/**
+ * Generates a new access token for the given user.
+ * 
+ * @param {Object} user - The user object containing user details.
+ * @param {string} user.token.refreshToken - The refresh token of the user.
+ * @returns {string} The new access token.
+ *  
+ * */
 const refreshToken = (user) => {
+
+  // Extract the user details from the user object
   const userLogged = user;
 
+  // Decode the refresh token
   const decoded = JWT.verify(
     userLogged.token?.refreshToken,
     `${process.env.SECRET_KEY_JWT}`
   );
 
+  // Generate a new access token
   const accesToken = JWT.sign(
     {
       _id: decoded._id,
@@ -56,6 +69,7 @@ const refreshToken = (user) => {
     { expiresIn: "1h" }
   );
 
+  // Return the new access token
   return accesToken;
 };
 
