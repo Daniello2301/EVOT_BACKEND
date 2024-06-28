@@ -25,9 +25,11 @@ router.post(
 router.post(
   "/auth/register",
   [
+    // middleware que valida el token y si es admin
     jwtValidador,
     isAdmin,
     [
+      // middleware que valida los campos
       check("nombreUsuario", "El nombre de usuario es requerido").notEmpty(),
       check("correo", "El correo es requerido").notEmpty(),
       check("correo", "El formato del correo es invalido").isEmail(),
